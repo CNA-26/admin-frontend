@@ -1,7 +1,7 @@
 import AdminLayout from "../layout/AdminLayout";
-import StatCard from "../components/StatCard";
-import OrdersTable from "../components/OrdersTable";
-import LowStock from "../components/LowStock";
+import StatCard from "../components/dashboard/StatCard";
+import OrdersTable from "../components/dashboard/OrdersTable";
+import LowStock from "../components/dashboard/LowStock";
 
 const AdminDashboard = () => {
   return (
