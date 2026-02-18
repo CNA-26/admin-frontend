@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 const Sidebar = () => {
   return (
     <aside className="w-64 min-h-screen bg-[var(--color-sidebar)] text-white flex flex-col">
@@ -6,15 +8,28 @@ const Sidebar = () => {
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
-        <a className="block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition">
+        <NavLink
+          to="/"
+          className={({ isActive }) =>
+            `block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition ${isActive ? "bg-[var(--color-sidebar-hover)]" : ""
+            }`
+          }
+        >
           Dashboard
-        </a>
+        </NavLink>
         <a className="block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition">
           Users
         </a>
-        <a className="block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition">
+        <NavLink
+          to="/products"
+          className={({ isActive }) =>
+            `block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition ${
+              isActive ? "bg-[var(--color-sidebar-hover)]" : ""
+            }`
+          }
+        >
           Products
-        </a>
+        </NavLink>
       </nav>
 
       <div className="p-4 border-t border-white/20">
