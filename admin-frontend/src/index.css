@@ -9,3 +9,13 @@
     --color-accent: #609966;
     --color-earth: #8C7A64;
 }
+
+body {
+    background-color: var(--color-background);
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    background-color: var(--color-background);
+}
