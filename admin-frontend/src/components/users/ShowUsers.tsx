@@ -54,7 +54,7 @@ const ShowUsers = () => {
                     const info = userInfo.find((u) => u.id === user.id);
 
                     return (
-                        <div key={user.id} className=/*"border-b hover:bg-gray-50"*/ "grid grid-cols-[80px_1fr_2fr_140px] bg-white rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition p-4 items-center">
+                        <div key={user.id} /*className="border-b hover:bg-gray-50" "grid grid-cols-[80px_1fr_2fr_140px] bg-white rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition p-4 items-center"*/>
                             <div
                                 onClick={() => toggleUser(user.id)}
                                 className="grid grid-cols-[80px_1fr_2fr_140px] bg-white rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition p-4 items-center cursor-pointer"
