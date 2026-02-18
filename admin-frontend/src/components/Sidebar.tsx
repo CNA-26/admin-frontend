@@ -19,9 +19,16 @@ const Sidebar = () => {
         >
           Dashboard
         </NavLink>
-        <a className="block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition">
+        <NavLink
+          to="/users"
+          className={({ isActive }) =>
+            `block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition ${
+              isActive ? "bg-[var(--color-sidebar-hover)]" : ""
+            }`
+          }
+        >
           Users
-        </a>
+        </NavLink>
         <NavLink
           to="/products"
           className={({ isActive }) =>
