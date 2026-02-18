@@ -1,6 +1,8 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
   return (
     <aside className="w-64 min-h-screen bg-[var(--color-sidebar)] text-white flex flex-col">
       <div className="p-6 text-2xl font-bold border-b border-white/20">
@@ -33,7 +35,10 @@ const Sidebar = () => {
       </nav>
 
       <div className="p-4 border-t border-white/20">
-        <button className="w-full bg-red-500 hover:bg-red-600 p-2 rounded transition">
+        <button
+          onClick={() => navigate("/login")}
+          className="w-full bg-red-500 hover:bg-red-600 p-2 rounded transition"
+        >
           Exit
         </button>
       </div>
