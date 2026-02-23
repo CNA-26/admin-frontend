@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import AdminLayout from "../layout/AdminLayout";
 import ProductCard from "../components/products/productCard";
+import AddProductCard from "../components/products/addProductCard";
 import { productApi } from "../api/productApi";
 import { inventoryApi } from "../api/inventoryApi";
 
@@ -81,6 +82,7 @@ const products = () => {
                             stock={product.stock}
                         />
                     ))}
+                   <AddProductCard/>
                 </div>
             )}
         </AdminLayout>
