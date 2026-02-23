@@ -1,22 +1,35 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MonsteraLogo from '../assets/Monstera.svg';
+import { useAuth } from '../context/AuthContext';
 
 export const AdminLogin: React.FC = () => {
-  const [username, setUsername] = useState('');
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!username.trim() || !password.trim()) {
-      setError('Please enter both username and password');
+    if (!email.trim() || !password.trim()) {
+      setError('Please enter both email and password');
       return;
     }
 
-    // TODO: Add authentication logic here
-    console.log('Login attempt:', { username, password });
+    try {
+      setIsSubmitting(true);
+      await login(email, password);
+      navigate('/', { replace: true });
+    } catch {
+      setError('Login failed. Please check your credentials.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -31,13 +44,13 @@ export const AdminLogin: React.FC = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
-            <label htmlFor="username" className="block text-[#40513B] font-semibold mb-2">Username</label>
+            <label htmlFor="email" className="block text-[#40513B] font-semibold mb-2">Email</label>
             <input
-              id="username"
-              type="text"
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40513B]"
             />
           </div>
@@ -54,8 +67,12 @@ export const AdminLogin: React.FC = () => {
             />
           </div>
 
-          <button type="submit" className="w-full bg-[#40513B] hover:bg-[#8C7A64] text-white font-semibold py-2 px-4 rounded-lg transition duration-200">
-            Login
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-[#40513B] hover:bg-[#8C7A64] disabled:opacity-70 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+          >
+            {isSubmitting ? 'Logging in...' : 'Login'}
           </button>
         </form>
       </div>

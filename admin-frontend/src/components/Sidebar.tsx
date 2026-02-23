@@ -1,7 +1,14 @@
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleExit = async () => {
+    await logout();
+    navigate("/login", { replace: true });
+  };
 
   return (
     <aside className="w-64 min-h-screen bg-[var(--color-sidebar)] text-white flex flex-col">
@@ -43,7 +50,7 @@ const Sidebar = () => {
 
       <div className="p-4 border-t border-white/20">
         <button
-          onClick={() => navigate("/login")}
+          onClick={handleExit}
           className="w-full bg-red-500 hover:bg-red-600 p-2 rounded transition"
         >
           Exit
