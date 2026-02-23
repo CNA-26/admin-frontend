@@ -17,7 +17,8 @@ interface Product {
 
 interface InventoryItem {
     sku: string;
-    stock: number;
+    quantity: number;
+    updatedAt: string;
 }
 
 interface ProductWithStock extends Product {
@@ -38,21 +39,19 @@ const products = () => {
                 const productsResponse = await productApi.get("/products");
                 const productsData: Product[] = productsResponse.data;
 
-                // Fetch inventory for each product based on SKU (product_code)
-                const inventoryPromises = productsData.map(product =>
-                    inventoryApi.get(`/api/products/${product.product_code}`)
-                        .then(res => ({ sku: product.product_code, stock: res.data.stock || 0 }))
-                        .catch(() => ({ sku: product.product_code, stock: 0 }))
+                // Fetch inventory list once and index by SKU
+                const inventoryResponse = await inventoryApi.get("/api/products");
+                const inventoryData: InventoryItem[] = inventoryResponse.data;
+                const inventoryBySku = new Map(
+                    inventoryData.map((item) => [item.sku, item.quantity])
                 );
-
-                const inventoryData = await Promise.all(inventoryPromises);
 
                 // Merge products with inventory data
                 const productsWithStock: ProductWithStock[] = productsData.map(product => {
-                    const inventory = inventoryData.find(inv => inv.sku === product.product_code);
+                    const stock = inventoryBySku.get(product.product_code) ?? 0;
                     return {
                         ...product,
-                        stock: inventory?.stock || 0
+                        stock
                     };
                 });
 
