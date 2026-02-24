@@ -35,7 +35,7 @@ const products = () => {
         const fetchProductsWithInventory = async () => {
             try {
                 setLoading(true);
-                
+
                 // Fetch products
                 const productsResponse = await productApi.get("/products");
                 const productsData: Product[] = productsResponse.data;
@@ -68,25 +68,28 @@ const products = () => {
         fetchProductsWithInventory();
     }, []);
 
-    return(
+    return (
         <AdminLayout>
             {loading && <div className="text-center py-8">Loading products...</div>}
             {error && <div className="text-center py-8 text-red-500">{error}</div>}
             {!loading && !error && (
                 <div className="grid grid-cols-4 gap-6 mb-6">
                     {products.map((product) => (
-                        <ProductCard 
+                        <ProductCard
                             key={product.id}
-                            name={product.product_name} 
-                            price={`€${product.price.toFixed(2)}`} 
+                            id={product.id}   // 👈 ADD THIS
+                            name={product.product_name}
+                            price={`€${product.price.toFixed(2)}`}
                             stock={product.stock}
+                            description_text={product.description_text}
+                            img={product.img}
                         />
                     ))}
-                   <AddProductCard/>
+                    <AddProductCard />
                 </div>
             )}
         </AdminLayout>
-    ) 
+    )
 }
 
 export default products;

@@ -32,13 +32,13 @@ const AddProductCard = () => {
             const payload = {
                 ...formData,
                 price: Number(formData.price),
-                stock: Number(formData.stock),
+                quantity: Number(formData.stock),
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
             };
 
             const response = await productApi.post("/products", payload);
-
+            window.location.reload();
             console.log("Created product:", response.data);
             
 
