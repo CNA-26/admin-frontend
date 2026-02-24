@@ -8,18 +8,19 @@ import {
 } from "../auth/token";
 import { refresh } from "./auth";
 
-export const userApi = axios.create({
-  baseURL: import.meta.env.USER_API_URL?.replace(/\/$/, ''),
+const baseUrl = import.meta.env.WISHLIST_API_URL?.replace(/\/$/, '');
+console.log("[wishlistApi] baseURL:", baseUrl);
+console.log("[wishlistApi] WISHLIST_API_URL env:", import.meta.env.WISHLIST_API_URL);
+
+export const wishlistApi = axios.create({
+  baseURL: baseUrl,
 });
 
-userApi.interceptors.request.use((config) => {
+wishlistApi.interceptors.request.use((config) => {
   const url = config.url ?? "";
-  const isAuthEndpoint =
-    url.includes("api/auth/login") ||
-    url.includes("api/auth/refresh") ||
-    url.includes("api/auth/logout");
-
-  if (isAuthEndpoint) {
+  
+  // Don't add auth header for stats endpoint
+  if (url.includes("wishlist/stats")) {
     return config;
   }
 
@@ -30,7 +31,7 @@ userApi.interceptors.request.use((config) => {
   return config;
 });
 
-userApi.interceptors.response.use(
+wishlistApi.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
@@ -49,7 +50,7 @@ userApi.interceptors.response.use(
 
         original.headers.Authorization = `Bearer ${data.accessToken}`;
 
-        return userApi(original);
+        return wishlistApi(original);
       } catch (err) {
         clearTokens();
         return Promise.reject(err);

@@ -8,21 +8,11 @@ import {
 } from "../auth/token";
 import { refresh } from "./auth";
 
-export const userApi = axios.create({
-  baseURL: import.meta.env.USER_API_URL?.replace(/\/$/, ''),
+export const inventoryApi = axios.create({
+  baseURL: import.meta.env.INVENTORY_API_URL?.replace(/\/$/, ''),
 });
 
-userApi.interceptors.request.use((config) => {
-  const url = config.url ?? "";
-  const isAuthEndpoint =
-    url.includes("api/auth/login") ||
-    url.includes("api/auth/refresh") ||
-    url.includes("api/auth/logout");
-
-  if (isAuthEndpoint) {
-    return config;
-  }
-
+inventoryApi.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -30,7 +20,7 @@ userApi.interceptors.request.use((config) => {
   return config;
 });
 
-userApi.interceptors.response.use(
+inventoryApi.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
@@ -49,7 +39,7 @@ userApi.interceptors.response.use(
 
         original.headers.Authorization = `Bearer ${data.accessToken}`;
 
-        return userApi(original);
+        return inventoryApi(original);
       } catch (err) {
         clearTokens();
         return Promise.reject(err);

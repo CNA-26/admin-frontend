@@ -110,6 +110,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function login(email: string, password: string) {
     const data = await loginApi(email, password);
 
+    console.log("Access Token:", data.accessToken);
+    console.log("Refresh Token:", data.refreshToken);
+
     setAccessToken(data.accessToken);
     setRefreshToken(data.refreshToken);
     setTokenState(data.accessToken);

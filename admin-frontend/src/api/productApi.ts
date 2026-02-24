@@ -8,21 +8,11 @@ import {
 } from "../auth/token";
 import { refresh } from "./auth";
 
-export const userApi = axios.create({
-  baseURL: import.meta.env.USER_API_URL?.replace(/\/$/, ''),
+export const productApi = axios.create({
+  baseURL: import.meta.env.PRODUCT_API_URL?.replace(/\/$/, ''),
 });
 
-userApi.interceptors.request.use((config) => {
-  const url = config.url ?? "";
-  const isAuthEndpoint =
-    url.includes("api/auth/login") ||
-    url.includes("api/auth/refresh") ||
-    url.includes("api/auth/logout");
-
-  if (isAuthEndpoint) {
-    return config;
-  }
-
+productApi.interceptors.request.use((config) => {
   const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -30,7 +20,7 @@ userApi.interceptors.request.use((config) => {
   return config;
 });
 
-userApi.interceptors.response.use(
+productApi.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
@@ -40,17 +30,21 @@ userApi.interceptors.response.use(
 
       try {
         const refreshToken = getRefreshToken();
+        console.log("[productApi] Attempting refresh with token:", refreshToken?.substring(0, 20) + "...");
+        
         if (!refreshToken) throw new Error("No refresh token");
 
         const data = await refresh(refreshToken);
+        console.log("[productApi] Refresh successful");
 
         setAccessToken(data.accessToken);
         setRefreshToken(data.refreshToken);
 
         original.headers.Authorization = `Bearer ${data.accessToken}`;
 
-        return userApi(original);
-      } catch (err) {
+        return productApi(original);
+      } catch (err: any) {
+        console.error("[productApi] Refresh failed:", err.response?.status, err.response?.data);
         clearTokens();
         return Promise.reject(err);
       }
