@@ -22,11 +22,7 @@ const ShowUsers = () => {
 
 
 
-    // const users = [
-    //     { id: 1, name: "Alice", email: "Alice.Schmalice@gmail.com", active: "12.01.2026" },
-    //     { id: 2, name: "Bob", email: "Bob.Schmob@gmail.com", active: "12.02.2026" },
-    //     { id: 3, name: "Charlie", email: "Charlie.Schmarlie@gmail.com", active: "01.01.2026" },
-    // ];
+
 
 
     useEffect(() => {
@@ -74,11 +70,7 @@ const ShowUsers = () => {
     if (loading) return <div>Loading users...</div>;
     if (error) return <div>Error: {error}</div>;
 
-    // const userInfo = [
-    //     { id: 1, name: "Alice", email: "Alice.Schmalice@gmail.com", active: "12.01.2026", address: "Romgatan 5 \n 00560 Helsingros", telefon: "040 123 4567", role: "Admin", status: "06.02.2026... Aktiv \n 24.02.2025... Betald", created: "12.12.1902" },
-    //     { id: 2, name: "Bob", email: "Bob.Schmob@gmail.com", active: "12.02.2026", address: "Romgatan 5 \n 00560 Helsingros", telefon: "040 123 4567", role: "Admin", status: "06.02.2026... Aktiv \n 24.02.2025... Betald", created: "12.12.1902" },
-    //     { id: 3, name: "Charlie", email: "Charlie.Schmarlie@gmail.com", active: "01.01.2026", address: "Romgatan 5 \n 00560 Helsingros", telefon: "040 123 4567", role: "Admin", status: "06.02.2026... Aktiv \n 24.02.2025... Betald", created: "12.12.1902" },
-    // ]
+
 
     const filteredUsers = users.filter((user) =>
         user.name?.toLowerCase().includes(search.toLowerCase()) ||
@@ -111,18 +103,18 @@ const ShowUsers = () => {
 
             <div className="space-y-3">
                 {filteredUsers.map((user) => {
-                    // const info = userInfo.find((u) => u.id === user.id);
+                    
                     const info = user;
 
                     return (
-                        <div key={user.id} /*className="border-b hover:bg-gray-50" "grid grid-cols-[80px_1fr_2fr_140px] bg-white rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition p-4 items-center"*/>
+                        <div key={user.id} >
                             <div
                                 onClick={() => toggleUser(user.id)}
                                 className="grid grid-cols-[2fr_2fr_0.5fr] bg-white rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition p-4 items-center cursor-pointer"
                             >
 
 
-                                {/* <div className="w-12 font-medium">{user.id}</div> */}
+                                
                                 <div className="w-40">{user.name || "-"}</div>
                                 <div className="flex-1">{user.email}</div>
                                 <div className="w-32 text-gray-500 text-sm">
