@@ -82,6 +82,11 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
         <>
             <div className="bg-[var(--color-card)] shadow-md shadow-black/10 rounded-lg p-6 flex flex-col justify-between">
                 <div>
+                    <img
+                        src={`/placeholder.jpg`}
+                        alt={name}
+                        className="w-85 h-85 object-cover rounded-md mb-4"
+                    />
                     <h3 className="text-lg font-semibold">{name}</h3>
                     <p className="text-gray-500 text-sm mt-1">Price: {price}</p>
                     <p className="text-gray-500 text-sm">
@@ -101,7 +106,7 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
                 </div>
 
                 <button
-                    className="mt-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-4 rounded-md transition"
+                    className="mt-4 bg-[#8c7a64] hover:bg-[#7a6a54] text-white text-sm font-medium py-2 px-4 rounded-md transition"
                     onClick={() => setIsModalOpen(true)}
                 >
                     Edit
