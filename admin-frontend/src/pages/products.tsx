@@ -77,12 +77,13 @@ const products = () => {
                     {products.map((product) => (
                         <ProductCard
                             key={product.id}
-                            id={product.id}   // 👈 ADD THIS
+                            id={product.id}
                             name={product.product_name}
                             price={`€${product.price.toFixed(2)}`}
                             stock={product.stock}
                             description_text={product.description_text}
                             img={product.img}
+                            product_code={product.product_code}
                         />
                     ))}
                     <AddProductCard />

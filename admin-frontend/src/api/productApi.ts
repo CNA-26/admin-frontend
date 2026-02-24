@@ -6,9 +6,10 @@ import {
   setRefreshToken,
   clearTokens,
 } from "../auth/token";
+import { refresh } from "./auth";
 
 export const productApi = axios.create({
-  baseURL: import.meta.env.PRODUCT_API_URL,
+  baseURL: import.meta.env.PRODUCT_API_URL?.replace(/\/$/, ''),
 });
 
 productApi.interceptors.request.use((config) => {
@@ -29,13 +30,12 @@ productApi.interceptors.response.use(
 
       try {
         const refreshToken = getRefreshToken();
+        console.log("[productApi] Attempting refresh with token:", refreshToken?.substring(0, 20) + "...");
+        
         if (!refreshToken) throw new Error("No refresh token");
 
-        const refreshRes = await axios.post(
-          `${import.meta.env.USER_API_URL}/api/auth/refresh`,
-          { refreshToken }
-        );
-        const data = refreshRes.data as { accessToken: string; refreshToken: string };
+        const data = await refresh(refreshToken);
+        console.log("[productApi] Refresh successful");
 
         setAccessToken(data.accessToken);
         setRefreshToken(data.refreshToken);
@@ -43,7 +43,8 @@ productApi.interceptors.response.use(
         original.headers.Authorization = `Bearer ${data.accessToken}`;
 
         return productApi(original);
-      } catch (err) {
+      } catch (err: any) {
+        console.error("[productApi] Refresh failed:", err.response?.status, err.response?.data);
         clearTokens();
         return Promise.reject(err);
       }

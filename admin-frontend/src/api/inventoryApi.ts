@@ -6,9 +6,10 @@ import {
   setRefreshToken,
   clearTokens,
 } from "../auth/token";
+import { refresh } from "./auth";
 
 export const inventoryApi = axios.create({
-  baseURL: import.meta.env.INVENTORY_API_URL,
+  baseURL: import.meta.env.INVENTORY_API_URL?.replace(/\/$/, ''),
 });
 
 inventoryApi.interceptors.request.use((config) => {
@@ -31,11 +32,7 @@ inventoryApi.interceptors.response.use(
         const refreshToken = getRefreshToken();
         if (!refreshToken) throw new Error("No refresh token");
 
-        const refreshRes = await axios.post(
-          `${import.meta.env.USER_API_URL}/api/auth/refresh`,
-          { refreshToken }
-        );
-        const data = refreshRes.data as { accessToken: string; refreshToken: string };
+        const data = await refresh(refreshToken);
 
         setAccessToken(data.accessToken);
         setRefreshToken(data.refreshToken);

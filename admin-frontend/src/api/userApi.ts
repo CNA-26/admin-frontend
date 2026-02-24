@@ -6,12 +6,23 @@ import {
   setRefreshToken,
   clearTokens,
 } from "../auth/token";
+import { refresh } from "./auth";
 
 export const userApi = axios.create({
-  baseURL: import.meta.env.USER_API_URL,
+  baseURL: import.meta.env.USER_API_URL?.replace(/\/$/, ''),
 });
 
 userApi.interceptors.request.use((config) => {
+  const url = config.url ?? "";
+  const isAuthEndpoint =
+    url.includes("api/auth/login") ||
+    url.includes("api/auth/refresh") ||
+    url.includes("api/auth/logout");
+
+  if (isAuthEndpoint) {
+    return config;
+  }
+
   const token = getAccessToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -31,11 +42,7 @@ userApi.interceptors.response.use(
         const refreshToken = getRefreshToken();
         if (!refreshToken) throw new Error("No refresh token");
 
-        const refreshRes = await axios.post(
-          `${import.meta.env.USER_API_URL}/api/auth/refresh`,
-          { refreshToken }
-        );
-        const data = refreshRes.data as { accessToken: string; refreshToken: string };
+        const data = await refresh(refreshToken);
 
         setAccessToken(data.accessToken);
         setRefreshToken(data.refreshToken);

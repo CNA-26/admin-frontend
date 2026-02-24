@@ -32,7 +32,6 @@ const AddProductCard = () => {
             const payload = {
                 ...formData,
                 price: Number(formData.price),
-                quantity: Number(formData.stock),
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString(),
             };

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Modal from "../modal.tsx";
 import { productApi } from "../../api/productApi.ts";
+import { inventoryApi } from "../../api/inventoryApi.ts";
 
 interface ProductCardProps {
     id: number;
@@ -9,9 +10,10 @@ interface ProductCardProps {
     stock: number; // for display only
     description_text: string;
     img: string;
+    product_code: string;
 }
 
-const ProductCard = ({ id, name, price, stock, description_text, img }: ProductCardProps) => {
+const ProductCard = ({ id, name, price, stock, description_text, img, product_code }: ProductCardProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -35,20 +37,26 @@ const ProductCard = ({ id, name, price, stock, description_text, img }: ProductC
         try {
             setLoading(true);
 
+            // Update product in product service (no quantity)
             await productApi.put(`/products/${id}`, {
                 product_name: formData.name,
                 price: Number(formData.price),
-                quantity: Number(formData.quantity),
                 description_text: formData.description_text,
                 img: formData.img,
                 updated_at: new Date().toISOString(),
             });
 
+            // Update inventory in inventory service using SKU
+            await inventoryApi.put(`/api/products/${product_code}`, {
+                quantity: Number(formData.quantity),
+            });
+
             console.log("Updated product:", id);
             setIsModalOpen(false);
             window.location.reload();
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to update product", error);
+            console.error("Inventory API response:", error.response?.data);
         } finally {
             setLoading(false);
         }
@@ -85,6 +93,11 @@ const ProductCard = ({ id, name, price, stock, description_text, img }: ProductC
                             {stock > 0 ? `${stock} available` : "Out of stock"}
                         </span>
                     </p>
+                    {description_text && (
+                        <p className="text-gray-600 text-sm mt-2 line-clamp-3">
+                            {description_text}
+                        </p>
+                    )}
                 </div>
 
                 <button
