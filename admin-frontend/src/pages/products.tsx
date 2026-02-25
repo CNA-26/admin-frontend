@@ -27,6 +27,8 @@ interface ProductWithStock extends Product {
 }
 
 const products = () => {
+    const [search, setSearch] = useState("");
+    const [sortBy, setSortBy] = useState<"name" | "priceCheap" | "priceExpensive" | "stockLow" | "stockHigh">("name");
     const [products, setProducts] = useState<ProductWithStock[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -68,26 +70,70 @@ const products = () => {
         fetchProductsWithInventory();
     }, []);
 
+    const filteredProducts = products.filter((product) =>
+        product.product_name.toLowerCase().includes(search.toLowerCase()) ||
+        product.product_code.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const sortedProducts = [...filteredProducts].sort((a, b) => {
+        switch (sortBy) {
+            case "priceCheap":
+                return a.price - b.price;
+            case "priceExpensive":
+                return b.price - a.price;
+            case "stockLow":
+                return a.stock - b.stock;
+            case "stockHigh":
+                return b.stock - a.stock;
+            case "name":
+            default:
+                return a.product_name.localeCompare(b.product_name);
+        }
+    })
+
     return (
         <AdminLayout>
             {loading && <div className="text-center py-8">Loading products...</div>}
             {error && <div className="text-center py-8 text-red-500">{error}</div>}
             {!loading && !error && (
-                <div className="grid grid-cols-4 gap-6 mb-6">
-                    {products.map((product) => (
-                        <ProductCard
-                            key={product.id}
-                            id={product.id}
-                            name={product.product_name}
-                            price={`€${product.price.toFixed(2)}`}
-                            stock={product.stock}
-                            description_text={product.description_text}
-                            img={product.img}
-                            product_code={product.product_code}
-                        />
-                    ))}
-                    <AddProductCard />
+
+                <><div className="mb-6">
+                    <input
+                        type="text"
+                        placeholder="Search product"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-67 flex justify-start mb-4 px-3 py-2 border bg-white rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+
+                    <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as any)}
+                        className="px-3 py-2 border rounded-lg bg-white"
+                    >
+                        <option value="name">Sort by name</option>
+                        <option value="priceCheap">Cheapest first</option>
+                        <option value="priceExpensive">Most expensive first</option>
+                        <option value="stockLow">Low stock first</option>
+                        <option value="stockHigh">High stock first</option>
+                    </select>
                 </div>
+
+                    <div className="grid grid-cols-4 gap-6 mb-6">
+                        {sortedProducts.map((product) => (
+                            <ProductCard
+                                key={product.id}
+                                id={product.id}
+                                name={product.product_name}
+                                price={`€${product.price.toFixed(2)}`}
+                                stock={product.stock}
+                                description_text={product.description_text}
+                                img={product.img}
+                                product_code={product.product_code}
+                            />
+                        ))}
+                        <AddProductCard />
+                    </div></>
             )}
         </AdminLayout>
     )
