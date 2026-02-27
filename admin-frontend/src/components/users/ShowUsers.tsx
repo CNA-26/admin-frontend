@@ -62,7 +62,7 @@ const ShowUsers = () => {
             await deleteUser(userId);
 
             setUsers((prevUsers) => prevUsers.filter((u) => u.id !== userId));
-        } catch (err:any) {
+        } catch (err: any) {
             setError(err.message)
         }
     }
@@ -103,7 +103,7 @@ const ShowUsers = () => {
 
             <div className="space-y-3">
                 {filteredUsers.map((user) => {
-                    
+
                     const info = user;
 
                     return (
@@ -114,7 +114,7 @@ const ShowUsers = () => {
                             >
 
 
-                                
+
                                 <div className="w-40">{user.name || "-"}</div>
                                 <div className="flex-1">{user.email}</div>
                                 <div className="w-32 text-gray-500 text-sm">
@@ -125,24 +125,29 @@ const ShowUsers = () => {
                             {
                                 openUserId === user.id && info && (
                                     <div className="bg-gray-50 rounded-xl p-4 mt-2 shadow-inner">
-                                        <div><strong>Address:</strong><pre className="whitespace-pre-wrap inline">{info.address}</pre></div>
-                                        <div><strong>Role:</strong>{info.role || "-"}</div>
-                                        <div><strong>Created:</strong>{info.createdAt ? new Date(info.createdAt).toLocaleDateString() : "-"}</div>
-                                        <div><select 
-                                            value={info.role}
-                                            onChange={(e) => handleRoleChange(user, e.target.value)}
-                                            className="ml-2 px-2 py-1 border rounded-xl bg-white"
-                                        >
-                                            <option value="USER">USER</option>
-                                            <option value="ADMIN">ADMIN</option>
-                                        </select></div>
-                                        <div className="mt-2">
-                                            <button 
-                                                onClick={() => handleDeleteUser(user.id)}
-                                                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                        <div className="flex justify-between">
+                                            <div>
+                                                <div><strong>Address:</strong><pre className="whitespace-pre-wrap inline">{info.address}</pre></div>
+                                                <div><strong>Role:</strong>{info.role || "-"}</div>
+                                                <div><strong>Created:</strong>{info.createdAt ? new Date(info.createdAt).toLocaleDateString() : "-"}</div>
+                                            </div>
+                                            <div className="flex items-center gap-2"><select
+                                                value={info.role}
+                                                onChange={(e) => handleRoleChange(user, e.target.value)}
+                                                className="h-9 px-3 border rounded-xl bg-white"
                                             >
-                                                Delete user
-                                            </button>
+                                                <option value="USER">USER</option>
+                                                <option value="ADMIN">ADMIN</option>
+                                            </select>
+                                                <div className="">
+                                                    <button
+                                                        onClick={() => handleDeleteUser(user.id)}
+                                                        className="h-9 px-3 bg-red-500 text-white rounded-xl hover:bg-red-600 flex items-center"
+                                                    >
+                                                        Delete user
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 )}

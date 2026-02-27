@@ -1,3 +1,4 @@
+import { userApi } from "../api/userApi";
 import {
   getAccessToken
 } from "../auth/token";
@@ -14,61 +15,23 @@ type User = {
 const API_URL = import.meta.env.USER_API_URL
 
 export const getUsers = async () => {
-    const token = getAccessToken();
-
-    const response = await fetch(`${API_URL}api/auth/users`, {
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        }
-    });
-
-    if (!response.ok) {
-        throw new Error("Failed to fetch users")
-    }
-    
-    return response.json();
+    const response = await userApi.get("/api/auth/users");
+    return response.data;
 }
 
 export const updateUserRole = async(user: User, role: string) => {
-    const token = getAccessToken();
+    const response = await userApi.put("/api/auth/users", {
+        userId: user.id,
+        email: user.email,
+        name: user.name,
+        role: role,
+        address: user.address
+    });
 
-    const response = await fetch(`${API_URL}api/auth/users`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-            userId: user.id,
-            email: user.email,
-            name: user.name,
-            role: role,
-            address: user.address
-        })
-    })
-    if (!response.ok) {
-        throw new Error("Failed to update user")
-    }
-
-    return response.json()
+    return response.data;
 }
 
 export const deleteUser = async (userId: string) => {
-    const token = getAccessToken();
-
-    const response = await fetch(`${API_URL}api/auth/users/${userId}`, {
-        method: "DELETE",
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-
-    })
-    if (!response.ok) {
-        const text = await response.text();
-        console.log("delete error", text)
-        throw new Error(text || "Failed to delete user")
-    }
-
+    await userApi.delete(`/api/auth/users/${userId}`);
     return true;
 }
