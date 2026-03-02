@@ -83,7 +83,7 @@ const ShowUsers = () => {
 
     return (
         <div className="bg-[var(--color-card)] shadow-md shadow-black/10 rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-4">Users</h2>
+            
 
 
             {/* Search Bar */}
@@ -96,9 +96,9 @@ const ShowUsers = () => {
             />
 
             <div className="grid grid-cols-[2fr_2fr_0.5fr] text-left mb-2 px-4 text-sm font-semibold text-gray-600">
-                <div>Namn</div>
+                <div>Name</div>
                 <div>Email</div>
-                <div>Skapad</div>
+                <div>Created</div>
             </div>
 
             <div className="space-y-3">
