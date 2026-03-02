@@ -13,6 +13,7 @@ type AuthState = {
   isLoading: boolean;
   isAuthenticated: boolean;
   role: string | null;
+  email: string | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -27,6 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setTokenState] = useState<string | null>(getAccessToken());
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
   const isAuthenticated = !!accessToken;
 
@@ -52,6 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (active) {
             setTokenState(currentAccessToken);
             setRole(decoded.role ?? null);
+            setEmail(decoded.email ?? null);
             setIsLoading(false);
           }
           return;
@@ -65,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (active) {
           setTokenState(null);
           setRole(null);
+          setEmail(null);
           setIsLoading(false);
         }
         return;
@@ -83,15 +87,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           clearTokens();
           setTokenState(null);
           setRole(null);
+          setEmail(null);
           return;
         }
 
         setRole(decoded.role ?? null);
+        setEmail(decoded.email ?? null);
       } catch {
         if (active) {
           clearTokens();
           setTokenState(null);
           setRole(null);
+          setEmail(null);
         }
       } finally {
         if (active) {
@@ -122,10 +129,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTokens();
       setTokenState(null);
       setRole(null);
+      setEmail(null);
       throw new Error("Unauthorized role");
     }
 
     setRole(decoded.role ?? null);
+    setEmail(decoded.email ?? null);
   }
 
   async function logout() {
@@ -139,11 +148,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       clearTokens();
       setTokenState(null);
       setRole(null);
+      setEmail(null);
     }
   }
 
   return (
-    <AuthContext.Provider value={{ isLoading, isAuthenticated, role, login, logout }}>
+    <AuthContext.Provider value={{ isLoading, isAuthenticated, role, email, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

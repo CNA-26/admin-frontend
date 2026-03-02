@@ -2,13 +2,29 @@ import { useState } from "react";
 import Modal from "../modal.tsx";
 import { productApi } from "../../api/productApi.ts";
 
+const getCategoryId = (category: string): number => {
+    switch (category.toLowerCase()) {
+        case "plants":
+            return 1;
+        case "flowers":
+            return 2;
+        case "other":
+            return 3;
+        default:
+            return 1;
+    }
+};
+
 const AddProductCard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imageName, setImageName] = useState("");
+    const [uploadingImage, setUploadingImage] = useState(false);
 
     const [formData, setFormData] = useState({
         product_name: "",
         price: "",
-        category_id: 1,
+        category: "plants",
         quantity: 0,
         description_text: "",
     });
@@ -23,11 +39,55 @@ const AddProductCard = () => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [uploadWarning, setUploadWarning] = useState<string | null>(null);
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] ?? null;
+        setImageFile(file);
+    };
+
+    const handleUploadImage = async () => {
+        if (!imageFile) {
+            setError("Please select an image file first");
+            return;
+        }
+
+        try {
+            setUploadingImage(true);
+            setError(null);
+            const imageData = new FormData();
+            imageData.append("image", imageFile);
+            const response = await productApi.post("/products/0/image", imageData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            const uploadedFilename = response.data;
+            setImageName(uploadedFilename);
+            setError(null);
+        } catch (err: any) {
+            let errorMessage = "Failed to upload image";
+            if (err.response?.data?.detail) {
+                errorMessage = Array.isArray(err.response.data.detail)
+                    ? err.response.data.detail.map((e: any) => e.msg).join(", ")
+                    : err.response.data.detail;
+            }
+            setError(errorMessage);
+            console.error("Image upload error:", err);
+        } finally {
+            setUploadingImage(false);
+        }
+    };
+
+    const handleImageNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setImageName(e.target.value);
+    };
 
     const handleSubmit = async () => {
         try {
             setLoading(true);
             setError(null);
+            setUploadWarning(null);
 
             if (!formData.product_name || !formData.price) {
                 setError("Product name and price are required");
@@ -39,7 +99,7 @@ const AddProductCard = () => {
                 product_name: formData.product_name,
                 price: Number(formData.price),
                 description_text: formData.description_text,
-                category_id: Number(formData.category_id),
+                category_id: getCategoryId(formData.category),
                 quantity: Number(formData.quantity),
             };
 
@@ -47,17 +107,36 @@ const AddProductCard = () => {
             const response = await productApi.post("/products", productPayload);
             console.log("Created product:", response.data);
 
-            setIsModalOpen(false);
-            window.location.reload();
+            if (imageName && response.data?.id) {
+                try {
+                    const imageData = new FormData();
+                    imageData.append("image", imageName);
+                    await productApi.post(`/products/${response.data.id}/image`, imageData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    });
+                } catch (uploadErr) {
+                    console.warn("Image association failed:", uploadErr);
+                    setUploadWarning("Product created, but image association failed. Try uploading and saving again.");
+                }
+            }
+
+            if (!uploadWarning) {
+                setIsModalOpen(false);
+                window.location.reload();
+            }
 
             // Optional: reset form
             setFormData({
                 product_name: "",
                 price: "",
-                category_id: 1,
+                category: "plants",
                 quantity: 0,
                 description_text: "",
             });
+            setImageFile(null);
+            setImageName("");
 
         } catch (err: any) {
             let errorMessage = "Failed to create product";
@@ -120,14 +199,14 @@ const AddProductCard = () => {
                     />
 
                     <select
-                        name="category_id"
-                        value={formData.category_id}
+                        name="category"
+                        value={formData.category}
                         onChange={handleChange}
                         className="w-full border rounded-md px-3 py-2 text-sm"
                     >
-                        <option value={1}>Plantor (Plants)</option>
-                        <option value={2}>Snittblommor (Cut Flowers)</option>
-                        <option value={3}>Övriga (Other)</option>
+                        <option value="plants">Plantor (Plants)</option>
+                        <option value="flowers">Snittblommor (Cut Flowers)</option>
+                        <option value="other">Övriga (Other)</option>
                     </select>
 
                     <input
@@ -144,9 +223,33 @@ const AddProductCard = () => {
                         className="w-full border rounded-md px-3 py-2 text-sm"
                         onChange={handleChange}
                     />
+
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Product Image</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="flex-1 border rounded-md px-3 py-2 text-sm"
+                                onChange={handleImageChange}
+                            />
+                            <button
+                                type="button"
+                                disabled={!imageFile || uploadingImage}
+                                onClick={handleUploadImage}
+                                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm font-medium py-2 px-4 rounded-md transition"
+                            >
+                                {uploadingImage ? "Uploading..." : "Upload"}
+                            </button>
+                        </div>
+                        {imageName && (
+                            <p className="text-xs text-green-600 mt-1">✓ Image stored: {imageName}</p>
+                        )}
+                    </div>
                 </div>
 
                 {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+                {uploadWarning && <div className="text-amber-600 text-sm mt-2">{uploadWarning}</div>}
                 <button
                     onClick={handleSubmit}
                     disabled={loading}

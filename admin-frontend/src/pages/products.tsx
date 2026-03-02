@@ -12,6 +12,7 @@ interface Product {
     product_code: string;
     description_text: string;
     img: string;
+    category: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -41,6 +42,7 @@ const products = () => {
                 // Fetch products
                 const productsResponse = await productApi.get("/products");
                 const productsData: Product[] = productsResponse.data;
+                console.log("Products from API:", productsData);
 
                 // Fetch inventory list once and index by SKU
                 const inventoryResponse = await inventoryApi.get("/api/products");
@@ -130,6 +132,7 @@ const products = () => {
                                 description_text={product.description_text}
                                 img={product.img}
                                 product_code={product.product_code}
+                                category={product.category}
                             />
                         ))}
                         <AddProductCard />

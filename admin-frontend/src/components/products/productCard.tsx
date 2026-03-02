@@ -11,19 +11,51 @@ interface ProductCardProps {
     description_text: string;
     img: string;
     product_code: string;
+    category: string | null;
 }
 
-const ProductCard = ({ id, name, price, stock, description_text, product_code }: ProductCardProps) => {
+const getCategoryName = (category: string | null): string => {
+    if (!category) return "Uncategorized";
+    switch (category.toLowerCase()) {
+        case "plants":
+            return "Plantor";
+        case "flowers":
+            return "Snittblommor";
+        case "other":
+            return "Övriga";
+        default:
+            return category.charAt(0).toUpperCase() + category.slice(1);
+    }
+};
+
+const getCategoryId = (category: string): number => {
+    switch (category.toLowerCase()) {
+        case "plants":
+            return 1;
+        case "flowers":
+            return 2;
+        case "other":
+            return 3;
+        default:
+            return 1;
+    }
+};
+
+const ProductCard = ({ id, name, price, stock, description_text, img, product_code, category }: ProductCardProps) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [uploadWarning, setUploadWarning] = useState<string | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [imageName, setImageName] = useState("");
+    const [uploadingImage, setUploadingImage] = useState(false);
 
     const [formData, setFormData] = useState({
         product_name: name,
         price: price.replace("€", ""),
         quantity: stock,
         description_text: description_text || "",
-        category_id: 1,
+        category: category || "plants",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -32,6 +64,62 @@ const ProductCard = ({ id, name, price, stock, description_text, product_code }:
             ...prev,
             [name]: value
         }));
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] ?? null;
+        setImageFile(file);
+    };
+
+    const resolveImageSrc = () => {
+        if (!img) return "/placeholder.jpg";
+        if (img.startsWith("http://") || img.startsWith("https://")) return img;
+        if (img.startsWith("data:")) return img;
+
+        const storedImage = localStorage.getItem(`product_image_${id}`);
+        if (storedImage) return storedImage;
+
+        const base = productApi.defaults.baseURL ?? "";
+        if (!base) return img;
+
+        if (img.includes("/")) {
+            return `${base.replace(/\/$/, "")}/${img.replace(/^\//, "")}`;
+        }
+
+        return `${base.replace(/\/$/, "")}/uploads/products/${img}`;
+    };
+
+    const handleUploadImage = async () => {
+        if (!imageFile) {
+            setError("Please select an image file first");
+            return;
+        }
+
+        try {
+            setUploadingImage(true);
+            setError(null);
+            const imageData = new FormData();
+            imageData.append("image", imageFile);
+            const response = await productApi.post(`/products/${id}/image`, imageData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            const uploadedFilename = response.data;
+            setImageName(uploadedFilename);
+            setError(null);
+        } catch (err: any) {
+            let errorMessage = "Failed to upload image";
+            if (err.response?.data?.detail) {
+                errorMessage = Array.isArray(err.response.data.detail)
+                    ? err.response.data.detail.map((e: any) => e.msg).join(", ")
+                    : err.response.data.detail;
+            }
+            setError(errorMessage);
+            console.error("Image upload error:", err);
+        } finally {
+            setUploadingImage(false);
+        }
     };
 
     const handleSave = async () => {
@@ -44,7 +132,7 @@ const ProductCard = ({ id, name, price, stock, description_text, product_code }:
                 product_name: formData.product_name,
                 price: Number(formData.price),
                 description_text: formData.description_text,
-                category_id: Number(formData.category_id),
+                category_id: getCategoryId(formData.category),
             });
 
             // Update stock in inventory service
@@ -52,9 +140,26 @@ const ProductCard = ({ id, name, price, stock, description_text, product_code }:
                 quantity: Number(formData.quantity),
             });
 
+            if (imageName) {
+                try {
+                    const imageData = new FormData();
+                    imageData.append("image", imageName);
+                    await productApi.post(`/products/${id}/image`, imageData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    });
+                } catch (uploadErr) {
+                    console.warn("Image association failed:", uploadErr);
+                    setUploadWarning("Product updated, but image association failed.");
+                }
+            }
+
             console.log("Updated product:", id);
-            setIsModalOpen(false);
-            window.location.reload();
+            if (!uploadWarning) {
+                setIsModalOpen(false);
+                window.location.reload();
+            }
         } catch (err: any) {
             let errorMessage = "Failed to update product";
             
@@ -96,12 +201,20 @@ const ProductCard = ({ id, name, price, stock, description_text, product_code }:
             <div className="bg-[var(--color-card)] shadow-md shadow-black/10 rounded-lg p-6 flex flex-col justify-between">
                 <div>
                     <img
-                        src={`/placeholder.jpg`}
+                        src={resolveImageSrc()}
                         alt={name}
                         className="w-85 h-85 object-cover rounded-md mb-4"
+                        onError={(e) => {
+                            e.currentTarget.src = "/placeholder.jpg";
+                        }}
                     />
-                    <div className="inline-flex items-center px-2 py-1 mb-2 text-xs font-medium bg-gray-100 text-gray-700 rounded-md border border-gray-200">
-                        SKU: {product_code}
+                    <div className="flex gap-2 mb-2">
+                        <div className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-md border border-gray-200">
+                            {product_code}
+                        </div>
+                        <div className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-md border border-blue-200">
+                            {getCategoryName(category)}
+                        </div>
                     </div>
                     <h3 className="text-lg font-semibold">{name}</h3>
                     <p className="text-gray-500 text-sm mt-1">Price: {price}</p>
@@ -159,14 +272,14 @@ const ProductCard = ({ id, name, price, stock, description_text, product_code }:
                     <div>
                         <label className="block text-sm font-medium mb-1">Category</label>
                     <select
-                        name="category_id"
-                        value={formData.category_id}
+                        name="category"
+                        value={formData.category}
                         onChange={handleChange}
                         className="w-full border rounded-md px-3 py-2 text-sm"
                     >
-                        <option value={1}>Plantor (Plants)</option>
-                        <option value={2}>Snittblommor (Cut Flowers)</option>
-                        <option value={3}>Övriga (Other)</option>
+                        <option value="plants">Plantor (Plants)</option>
+                        <option value="flowers">Snittblommor (Cut Flowers)</option>
+                        <option value="other">Övriga (Other)</option>
                     </select>
                     </div>
                     <div>
@@ -189,9 +302,44 @@ const ProductCard = ({ id, name, price, stock, description_text, product_code }:
                         placeholder="Description"
                     />
                     </div>
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Product Image</label>
+                        <div className="flex gap-2">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className="flex-1 border rounded-md px-3 py-2 text-sm"
+                                onChange={handleImageChange}
+                            />
+                            <button
+                                type="button"
+                                disabled={!imageFile || uploadingImage}
+                                onClick={handleUploadImage}
+                                className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white text-sm font-medium py-2 px-4 rounded-md transition"
+                            >
+                                {uploadingImage ? "Uploading..." : "Upload"}
+                            </button>
+                        </div>
+                        {imageName && (
+                            <p className="text-xs text-green-600 mt-1">✓ Image stored: {imageName}</p>
+                        )}
+                    </div>
                 </div>
 
                 {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+                {uploadWarning && (
+                    <div className="text-amber-600 text-sm mt-2 p-2 bg-amber-50 rounded">
+                        {uploadWarning}
+                        <button
+                            type="button"
+                            onClick={handleUploadImage}
+                            disabled={!imageFile || uploadingImage}
+                            className="ml-2 text-amber-700 font-medium hover:underline"
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
                 <div className="flex gap-2 mt-4">
                     <button
                         onClick={handleSave}
