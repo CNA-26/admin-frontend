@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUsers, updateUserRole, deleteUser } from "../../services/userService";
-import { userApi } from "../../api/userApi";
+
 
 type User = {
     id: string;

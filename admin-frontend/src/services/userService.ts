@@ -1,7 +1,5 @@
 import { userApi } from "../api/userApi";
-import {
-  getAccessToken
-} from "../auth/token";
+
 
 type User = {
     id: string;
@@ -12,7 +10,7 @@ type User = {
     createdAt?: string;
 }
 
-const API_URL = import.meta.env.USER_API_URL
+// const API_URL = import.meta.env.USER_API_URL
 
 export const getUsers = async () => {
     const response = await userApi.get("/api/auth/users");
