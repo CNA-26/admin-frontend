@@ -107,10 +107,10 @@ const ShowUsers = () => {
                     const info = user;
 
                     return (
-                        <div key={user.id} >
+                        <div key={user.id} className="bg-white shadow-sm rounded-xl overflow-hidden">
                             <div
                                 onClick={() => toggleUser(user.id)}
-                                className="grid grid-cols-[2fr_2fr_0.5fr] bg-white rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 transition p-4 items-center cursor-pointer"
+                                className="grid grid-cols-[2fr_2fr_0.5fr] hover:shadow-md transition p-4 items-center cursor-pointer"
                             >
 
 
@@ -124,29 +124,28 @@ const ShowUsers = () => {
 
                             {
                                 openUserId === user.id && info && (
-                                    <div className="bg-gray-50 rounded-xl p-4 mt-2 shadow-inner">
+                                    <div className="bg-gray-50 p-4 border-t border-gray-200">
                                         <div className="flex justify-between">
-                                            <div>
-                                                <div><strong>Address:</strong><pre className="whitespace-pre-wrap inline">{info.address}</pre></div>
-                                                <div><strong>Role:</strong>{info.role || "-"}</div>
-                                                <div><strong>Created:</strong>{info.createdAt ? new Date(info.createdAt).toLocaleDateString() : "-"}</div>
+                                            <div className="space-y-2">
+                                                <div><strong>Address:</strong> <pre className="whitespace-pre-wrap inline">{info.address}</pre></div>
+                                                <div><strong>Role:</strong> {info.role || "-"}</div>
+                                                <div><strong>Created:</strong> {info.createdAt ? new Date(info.createdAt).toLocaleDateString() : "-"}</div>
                                             </div>
-                                            <div className="flex items-center gap-2"><select
-                                                value={info.role}
-                                                onChange={(e) => handleRoleChange(user, e.target.value)}
-                                                className="h-9 px-3 border rounded-xl bg-white"
-                                            >
-                                                <option value="USER">USER</option>
-                                                <option value="ADMIN">ADMIN</option>
-                                            </select>
-                                                <div className="">
-                                                    <button
-                                                        onClick={() => handleDeleteUser(user.id)}
-                                                        className="h-9 px-3 bg-red-500 text-white rounded-xl hover:bg-red-600 flex items-center"
-                                                    >
-                                                        Delete user
-                                                    </button>
-                                                </div>
+                                            <div className="flex flex-col gap-2">
+                                                <select
+                                                    value={info.role}
+                                                    onChange={(e) => handleRoleChange(user, e.target.value)}
+                                                    className="h-9 px-3 border rounded-xl bg-white"
+                                                >
+                                                    <option value="USER">USER</option>
+                                                    <option value="ADMIN">ADMIN</option>
+                                                </select>
+                                                <button
+                                                    onClick={() => handleDeleteUser(user.id)}
+                                                    className="h-9 px-3 bg-red-500 text-white rounded-xl hover:bg-red-600 flex items-center justify-center"
+                                                >
+                                                    Delete user
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

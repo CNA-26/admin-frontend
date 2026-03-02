@@ -51,7 +51,7 @@ export const AdminLogin: React.FC = () => {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40513B]"
+              className="w-full px-4 py-2 border border-gray-300 bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-[#40513B]"
             />
           </div>
 
@@ -63,14 +63,14 @@ export const AdminLogin: React.FC = () => {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#40513B]"
+              className="w-full px-4 py-2 border border-gray-300 bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-[#40513B]"
             />
           </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[#40513B] hover:bg-[#8C7A64] disabled:opacity-70 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+            className="w-full bg-[#8c7a64] hover:bg-[#7a6a54] disabled:opacity-70 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
           >
             {isSubmitting ? 'Logging in...' : 'Login'}
           </button>
