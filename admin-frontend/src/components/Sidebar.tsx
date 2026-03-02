@@ -48,7 +48,7 @@ const Sidebar = () => {
         </NavLink>
       </nav>
 
-      <div className="p-4 border-t border-white/20">
+      <div className="sticky bottom-0 p-4 border-t border-white/20 bg-[var(--color-sidebar)]">
         <button
           onClick={handleExit}
           className="w-full bg-red-500 hover:bg-red-600 p-2 rounded transition"
