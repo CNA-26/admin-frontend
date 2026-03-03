@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { productApi } from "../../api/productApi";
 import { inventoryApi } from "../../api/inventoryApi";
+import { getAccessToken } from "../../auth/token";
 
 interface LowStockProduct {
   name: string;
@@ -12,11 +13,6 @@ interface Product {
   id: number;
   product_name: string;
   product_code: string;
-}
-
-interface InventoryItem {
-  sku: string;
-  quantity: number;
 }
 
 const LowStock = () => {
@@ -35,9 +31,34 @@ const LowStock = () => {
         const productsRes = await productApi.get("/products");
         const products: Product[] = productsRes.data;
 
-        // Fetch inventory
-        const inventoryRes = await inventoryApi.get("/api/products");
-        const inventory: InventoryItem[] = inventoryRes.data;
+        const accessToken = getAccessToken();
+
+        // Fetch inventory per SKU
+        const inventory = await Promise.all(
+          products.map(async (product) => {
+            try {
+              const response = await inventoryApi.get(
+                `/api/products/${encodeURIComponent(product.product_code)}`,
+                {
+                  params: { accessToken },
+                  headers: accessToken
+                    ? { Authorization: `Bearer ${accessToken}` }
+                    : undefined,
+                }
+              );
+
+              return {
+                sku: response.data?.sku ?? product.product_code,
+                quantity: Number(response.data?.quantity ?? 0),
+              };
+            } catch {
+              return {
+                sku: product.product_code,
+                quantity: 0,
+              };
+            }
+          })
+        );
 
         // Create inventory map by SKU
         const inventoryMap = new Map(

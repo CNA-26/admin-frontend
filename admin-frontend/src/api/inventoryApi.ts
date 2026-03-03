@@ -24,8 +24,13 @@ inventoryApi.interceptors.response.use(
   (res) => res,
   async (error) => {
     const original = error.config;
+    const status = error.response?.status;
+    const message = String(error.response?.data?.message ?? "").toLowerCase();
+    const shouldRefresh =
+      status === 401 ||
+      (status === 403 && (message.includes("invalid") || message.includes("expired")));
 
-    if (error.response?.status === 401 && !original._retry) {
+    if (shouldRefresh && !original._retry) {
       original._retry = true;
 
       try {
@@ -38,6 +43,12 @@ inventoryApi.interceptors.response.use(
         setRefreshToken(data.refreshToken);
 
         original.headers.Authorization = `Bearer ${data.accessToken}`;
+        if (original.params?.accessToken) {
+          original.params.accessToken = data.accessToken;
+        }
+        if (original.data?.accessToken) {
+          original.data.accessToken = data.accessToken;
+        }
 
         return inventoryApi(original);
       } catch (err) {

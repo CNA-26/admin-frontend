@@ -200,9 +200,9 @@ const AddProductCard = () => {
                         onChange={handleChange}
                         className="w-full border rounded-md px-3 py-2 text-sm"
                     >
-                        <option value="plants">Plantor (Plants)</option>
-                        <option value="flowers">Snittblommor (Cut Flowers)</option>
-                        <option value="other">Övriga (Other)</option>
+                        <option value="plants">Plants</option>
+                        <option value="flowers">Cut Flowers</option>
+                        <option value="other">Other</option>
                     </select>
 
                     <input

@@ -18,11 +18,11 @@ const getCategoryName = (category: string | null): string => {
     if (!category) return "Uncategorized";
     switch (category.toLowerCase()) {
         case "plants":
-            return "Plantor";
+            return "Plants";
         case "flowers":
-            return "Snittblommor";
+            return "Cut Flowers";
         case "other":
-            return "Övriga";
+            return "Other";
         default:
             return category.charAt(0).toUpperCase() + category.slice(1);
     }
@@ -49,6 +49,7 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [imageName, setImageName] = useState("");
     const [uploadingImage, setUploadingImage] = useState(false);
+    const [currentStock, setCurrentStock] = useState(stock);
 
     const [formData, setFormData] = useState({
         product_name: name,
@@ -58,11 +59,21 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
         category: category || "plants",
     });
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
+    //console.log(typeof formData.quantity, formData.quantity);
+
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    ) => {
+        const { name, value, type } = e.target;
+
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]:
+                type === "number"
+                    ? value === ""
+                        ? ""
+                        : Number(value)
+                    : value
         }));
     };
 
@@ -127,7 +138,6 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
             setLoading(true);
             setError(null);
 
-            // Update product in product service
             await productApi.put(`/products/${id}`, {
                 product_name: formData.product_name,
                 price: Number(formData.price),
@@ -135,10 +145,11 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
                 category_id: getCategoryId(formData.category),
             });
 
-            // Update stock in inventory service
             await inventoryApi.put(`/api/products/${product_code}`, {
                 quantity: Number(formData.quantity),
             });
+
+            setCurrentStock(Number(formData.quantity));
 
             if (imageName) {
                 try {
@@ -162,17 +173,17 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
             }
         } catch (err: any) {
             let errorMessage = "Failed to update product";
-            
+
             if (err.response?.data?.detail && Array.isArray(err.response.data.detail)) {
                 errorMessage = err.response.data.detail.map((e: any) => e.msg || e.detail || String(e)).join(", ");
-            } 
+            }
             else if (err.response?.data?.detail) {
                 errorMessage = err.response.data.detail;
-            } 
+            }
             else if (err.response?.data?.message) {
                 errorMessage = err.response.data.message;
             }
-            
+
             setError(errorMessage);
             console.error("Failed to update product", err);
         } finally {
@@ -221,10 +232,10 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
                     <p className="text-gray-500 text-sm">
                         Stock:{" "}
                         <span
-                            className={`font-medium ${stock > 0 ? "text-green-600" : "text-red-600"
+                            className={`font-medium ${currentStock > 0 ? "text-green-600" : "text-red-600"
                                 }`}
                         >
-                            {stock > 0 ? `${stock} available` : "Out of stock"}
+                            {currentStock > 0 ? `${currentStock} available` : "Out of stock"}
                         </span>
                     </p>
                     {description_text && (
@@ -251,56 +262,56 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
                 <div className="space-y-3">
                     <div>
                         <label className="block text-sm font-medium mb-1">Product Name</label>
-                    <input
-                        type="text"
-                        name="product_name"
-                        value={formData.product_name}
-                        onChange={handleChange}
-                        className="w-full border rounded-md px-3 py-2 text-sm"
-                    />
+                        <input
+                            type="text"
+                            name="product_name"
+                            value={formData.product_name}
+                            onChange={handleChange}
+                            className="w-full border rounded-md px-3 py-2 text-sm"
+                        />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Price</label>
-                    <input
-                        type="number"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        className="w-full border rounded-md px-3 py-2 text-sm"
-                    />
+                        <input
+                            type="number"
+                            name="price"
+                            value={formData.price}
+                            onChange={handleChange}
+                            className="w-full border rounded-md px-3 py-2 text-sm"
+                        />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Category</label>
-                    <select
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        className="w-full border rounded-md px-3 py-2 text-sm"
-                    >
-                        <option value="plants">Plantor (Plants)</option>
-                        <option value="flowers">Snittblommor (Cut Flowers)</option>
-                        <option value="other">Övriga (Other)</option>
-                    </select>
+                        <select
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            className="w-full border rounded-md px-3 py-2 text-sm"
+                        >
+                            <option value="plants">Plants</option>
+                            <option value="flowers">Cut Flowers</option>
+                            <option value="other">Other</option>
+                        </select>
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Quantity</label>
-                    <input
-                        type="number"
-                        name="quantity"
-                        value={formData.quantity}
-                        onChange={handleChange}
-                        className="w-full border rounded-md px-3 py-2 text-sm"
-                    />
+                        <input
+                            type="number"
+                            name="quantity"
+                            value={formData.quantity}
+                            onChange={handleChange}
+                            className="w-full border rounded-md px-3 py-2 text-sm"
+                        />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Description</label>
-                    <textarea
-                        name="description_text"
-                        value={formData.description_text}
-                        onChange={handleChange}
-                        className="w-full border rounded-md px-3 py-2 text-sm"
-                        placeholder="Description"
-                    />
+                        <textarea
+                            name="description_text"
+                            value={formData.description_text}
+                            onChange={handleChange}
+                            className="w-full border rounded-md px-3 py-2 text-sm"
+                            placeholder="Description"
+                        />
                     </div>
                     <div>
                         <label className="block text-sm font-medium mb-1">Product Image</label>
