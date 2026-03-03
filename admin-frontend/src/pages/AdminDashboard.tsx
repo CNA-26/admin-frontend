@@ -5,6 +5,8 @@ import OrdersTable from "../components/dashboard/OrdersTable";
 import LowStock from "../components/dashboard/LowStock";
 import { productApi } from "../api/productApi";
 import { userApi } from "../api/userApi";
+import { inventoryApi } from "../api/inventoryApi";
+import { getAccessToken } from "../auth/token";
 
 interface DashboardStats {
   totalUsers: number;
@@ -16,6 +18,16 @@ interface DashboardStats {
   minProductPrice: number;
   productsCreatedToday: number;
   productsCreatedThisWeek: number;
+  totalInventoryUnits: number;
+  outOfStockProducts: number;
+  lowStockProducts: number;
+  inventoryValue: number;
+}
+
+interface Product {
+  product_code: string;
+  price: number;
+  created_at: string;
 }
 
 const AdminDashboard = () => {
@@ -29,6 +41,10 @@ const AdminDashboard = () => {
     minProductPrice: 0,
     productsCreatedToday: 0,
     productsCreatedThisWeek: 0,
+    totalInventoryUnits: 0,
+    outOfStockProducts: 0,
+    lowStockProducts: 0,
+    inventoryValue: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +55,7 @@ const AdminDashboard = () => {
 
         // Fetch products
         const productsRes = await productApi.get("/products");
-        const products = productsRes.data || [];
+        const products: Product[] = productsRes.data || [];
         const productCount = products.length;
 
         // Fetch users
@@ -80,6 +96,55 @@ const AdminDashboard = () => {
           return createdDate >= weekAgo;
         }).length;
 
+        const accessToken = getAccessToken();
+        const inventoryRows = await Promise.all(
+          products.map(async (product) => {
+            try {
+              const response = await inventoryApi.get(
+                `/api/products/${encodeURIComponent(product.product_code)}`,
+                {
+                  params: { accessToken },
+                  headers: accessToken
+                    ? { Authorization: `Bearer ${accessToken}` }
+                    : undefined,
+                }
+              );
+
+              return {
+                sku: response.data?.sku ?? product.product_code,
+                quantity: Number(response.data?.quantity ?? 0),
+              };
+            } catch {
+              return {
+                sku: product.product_code,
+                quantity: 0,
+              };
+            }
+          })
+        );
+
+        const quantityBySku = new Map(
+          inventoryRows.map((row) => [row.sku, row.quantity])
+        );
+
+        const totalInventoryUnits = products.reduce(
+          (sum, product) => sum + (quantityBySku.get(product.product_code) ?? 0),
+          0
+        );
+
+        const outOfStockProducts = products.filter(
+          (product) => (quantityBySku.get(product.product_code) ?? 0) === 0
+        ).length;
+
+        const lowStockProducts = products.filter(
+          (product) => (quantityBySku.get(product.product_code) ?? 0) > 0 && (quantityBySku.get(product.product_code) ?? 0) <= 10
+        ).length;
+
+        const inventoryValue = products.reduce((sum, product) => {
+          const quantity = quantityBySku.get(product.product_code) ?? 0;
+          return sum + quantity * Number(product.price || 0);
+        }, 0);
+
         setStats({
           totalUsers: userCount,
           totalProducts: productCount,
@@ -90,6 +155,10 @@ const AdminDashboard = () => {
           minProductPrice,
           productsCreatedToday,
           productsCreatedThisWeek,
+          totalInventoryUnits,
+          outOfStockProducts,
+          lowStockProducts,
+          inventoryValue,
         });
       } catch (error) {
         console.error("Failed to fetch dashboard stats:", error);
@@ -107,15 +176,16 @@ const AdminDashboard = () => {
         <StatCard title="Total Users" value={loading ? "..." : stats.totalUsers.toString()} />
         <StatCard title="New Users Today" value={loading ? "..." : stats.usersCreatedToday.toString()} />
         <StatCard title="New Users This Week" value={loading ? "..." : stats.usersCreatedThisWeek.toString()} />
-        <StatCard title="Total Products" value={loading ? "..." : stats.totalProducts.toString()} />
+        <StatCard title="New Products This Week" value={loading ? "..." : stats.productsCreatedThisWeek.toString()} />
       </div>
 
       <div className="grid grid-cols-4 gap-6 mb-6">
         <StatCard title="Avg Product Price" value={loading ? "..." : stats.avgProductPrice + "€"} />
-        <StatCard title="Most Expensive" value={loading ? "..." : stats.maxProductPrice + "€"} />
-        <StatCard title="Least Expensive" value={loading ? "..." : stats.minProductPrice + "€"} />
-        <StatCard title="New Products This Week" value={loading ? "..." : stats.productsCreatedThisWeek.toString()} />
+        <StatCard title="Inventory Value" value={loading ? "..." : `${stats.inventoryValue.toFixed(2)}€`} />
+        <StatCard title="Total Products" value={loading ? "..." : stats.totalProducts.toString()} />
+        <StatCard title="Units In Inventory" value={loading ? "..." : stats.totalInventoryUnits.toString()} />
       </div>
+
 
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-2">

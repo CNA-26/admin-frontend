@@ -18,11 +18,11 @@ const getCategoryName = (category: string | null): string => {
     if (!category) return "Uncategorized";
     switch (category.toLowerCase()) {
         case "plants":
-            return "Plantor";
+            return "Plants";
         case "flowers":
-            return "Snittblommor";
+            return "Cut Flowers";
         case "other":
-            return "Övriga";
+            return "Other";
         default:
             return category.charAt(0).toUpperCase() + category.slice(1);
     }
@@ -288,9 +288,9 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
                             onChange={handleChange}
                             className="w-full border rounded-md px-3 py-2 text-sm"
                         >
-                            <option value="plants">Plantor (Plants)</option>
-                            <option value="flowers">Snittblommor (Cut Flowers)</option>
-                            <option value="other">Övriga (Other)</option>
+                            <option value="plants">Plants</option>
+                            <option value="flowers">Cut Flowers</option>
+                            <option value="other">Other</option>
                         </select>
                     </div>
                     <div>

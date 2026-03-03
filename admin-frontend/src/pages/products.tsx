@@ -161,9 +161,9 @@ const products = () => {
                         className="px-3 py-2 border rounded-lg bg-white"
                     >
                         <option value="all">All</option>
-                        <option value="plants">Plantor</option>
-                        <option value="flowers">Snittblommor</option>
-                        <option value="other">Övrigt</option>
+                        <option value="plants">Plants</option>
+                        <option value="flowers">Cut Flowers</option>
+                        <option value="other">Other</option>
                     </select>
                 </div>
 
