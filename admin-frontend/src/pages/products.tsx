@@ -31,6 +31,7 @@ interface ProductWithStock extends Product {
 const products = () => {
     const [search, setSearch] = useState("");
     const [sortBy, setSortBy] = useState<"name" | "priceCheap" | "priceExpensive" | "stockLow" | "stockHigh">("name");
+    const [categoryFilter, setCategoryFilter] = useState<"all" | "plants" | "flowers" | "other">("all")
     const [products, setProducts] = useState<ProductWithStock[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -78,7 +79,11 @@ const products = () => {
         product.product_code.toLowerCase().includes(search.toLowerCase())
     );
 
-    const sortedProducts = [...filteredProducts].sort((a, b) => {
+    const categoryFiltered = filteredProducts.filter(product =>
+        categoryFilter == "all" || product.category === categoryFilter
+    );
+
+    const sortedProducts = [...categoryFiltered].sort((a, b) => {
         switch (sortBy) {
             case "priceCheap":
                 return a.price - b.price;
@@ -119,6 +124,17 @@ const products = () => {
                         <option value="priceExpensive">Most expensive first</option>
                         <option value="stockLow">Low stock first</option>
                         <option value="stockHigh">High stock first</option>
+                    </select>
+
+                    <select
+                        value={categoryFilter}
+                        onChange={(e) => setCategoryFilter(e.target.value as any)}
+                        className="px-3 py-2 border rounded-lg bg-white"
+                    >
+                        <option value="all">All</option>
+                        <option value="plants">Plantor</option>
+                        <option value="flowers">Snittblommor</option>
+                        <option value="other">Övrigt</option>
                     </select>
                 </div>
 
