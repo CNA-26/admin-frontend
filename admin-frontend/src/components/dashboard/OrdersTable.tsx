@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { wishlistApi } from "../../api/wishlistApi";
 import { inventoryApi } from "../../api/inventoryApi";
 import { productApi } from "../../api/productApi";
+import { getAccessToken } from "../../auth/token";
 
 interface WishlistItem {
   sku: string;
@@ -14,11 +15,6 @@ interface Product {
   id: number;
   product_name: string;
   product_code: string;
-}
-
-interface InventoryItem {
-  sku: string;
-  quantity: number;
 }
 
 const OrdersTable = () => {
@@ -52,9 +48,35 @@ const OrdersTable = () => {
         const productsRes = await productApi.get("/products");
         const products: Product[] = productsRes.data;
 
-        // Fetch inventory
-        const inventoryRes = await inventoryApi.get("/api/products");
-        const inventory: InventoryItem[] = inventoryRes.data;
+        const accessToken = getAccessToken();
+        const wishlistSkus = Object.keys(wishlistStats);
+
+        // Fetch inventory per SKU (wishlist SKUs only)
+        const inventory = await Promise.all(
+          wishlistSkus.map(async (sku) => {
+            try {
+              const response = await inventoryApi.get(
+                `/api/products/${encodeURIComponent(sku)}`,
+                {
+                  params: { accessToken },
+                  headers: accessToken
+                    ? { Authorization: `Bearer ${accessToken}` }
+                    : undefined,
+                }
+              );
+
+              return {
+                sku: response.data?.sku ?? sku,
+                quantity: Number(response.data?.quantity ?? 0),
+              };
+            } catch {
+              return {
+                sku,
+                quantity: 0,
+              };
+            }
+          })
+        );
 
         // Create lookup maps
         const productMap = new Map(
