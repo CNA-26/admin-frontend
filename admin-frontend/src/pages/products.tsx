@@ -11,7 +11,8 @@ interface Product {
     price: number;
     product_code: string;
     description_text: string;
-    img: string;
+    img?: string;
+    image_urls?: string[];
     category: string | null;
     created_at: string;
     updated_at: string;
@@ -130,7 +131,7 @@ const products = () => {
                                 price={`€${product.price.toFixed(2)}`}
                                 stock={product.stock}
                                 description_text={product.description_text}
-                                img={product.img}
+                                img={product.image_urls?.[0] || product.img || ""}
                                 product_code={product.product_code}
                                 category={product.category}
                             />
