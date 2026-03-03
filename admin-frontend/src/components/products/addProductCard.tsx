@@ -79,10 +79,6 @@ const AddProductCard = () => {
         }
     };
 
-    const handleImageNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setImageName(e.target.value);
-    };
-
     const handleSubmit = async () => {
         try {
             setLoading(true);
