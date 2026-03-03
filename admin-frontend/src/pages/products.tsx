@@ -4,6 +4,7 @@ import ProductCard from "../components/products/productCard";
 import AddProductCard from "../components/products/addProductCard";
 import { productApi } from "../api/productApi";
 import { inventoryApi } from "../api/inventoryApi";
+import { getAccessToken } from "../auth/token";
 
 interface Product {
     id: number;
@@ -46,11 +47,39 @@ const products = () => {
                 const productsData: Product[] = productsResponse.data;
                 console.log("Products from API:", productsData);
 
-                // Fetch inventory list once and index by SKU
-                const inventoryResponse = await inventoryApi.get("/api/products");
-                const inventoryData: InventoryItem[] = inventoryResponse.data;
+                const accessToken = getAccessToken();
+
+                // Fetch inventory per SKU and include access JWT in request payload/config
+                const inventoryResults = await Promise.all(
+                    productsData.map(async (product) => {
+                        const skuPath = `/api/products/${encodeURIComponent(product.product_code)}`;
+                        const requestConfig = {
+                            params: {
+                                accessToken,
+                            },
+                            headers: accessToken
+                                ? { Authorization: `Bearer ${accessToken}` }
+                                : undefined,
+                        };
+
+                        try {
+                            const response = await inventoryApi.get<InventoryItem>(skuPath, requestConfig);
+
+                            return {
+                                sku: response.data?.sku ?? product.product_code,
+                                quantity: Number(response.data?.quantity ?? 0),
+                            };
+                        } catch {
+                            return {
+                                sku: product.product_code,
+                                quantity: 0,
+                            };
+                        }
+                    })
+                );
+
                 const inventoryBySku = new Map(
-                    inventoryData.map((item) => [item.sku, item.quantity])
+                    inventoryResults.map((item) => [item.sku, item.quantity])
                 );
 
                 // Merge products with inventory data
