@@ -170,6 +170,7 @@ const products = () => {
                 </div>
 
                     <div className="grid grid-cols-4 gap-6 mb-6">
+                        <AddProductCard />
                         {sortedProducts.map((product) => (
                             <ProductCard
                                 key={product.id}
@@ -178,12 +179,11 @@ const products = () => {
                                 price={`€${product.price.toFixed(2)}`}
                                 stock={product.stock}
                                 description_text={product.description_text}
-                                img={product.image_urls?.[0] || product.img || ""}
+                                img={product.image_urls?.[product.image_urls.length - 1]|| product.img || "/placeholder.jpg"}
                                 product_code={product.product_code}
                                 category={product.category}
                             />
                         ))}
-                        <AddProductCard />
                     </div></>
             )}
         </AdminLayout>
