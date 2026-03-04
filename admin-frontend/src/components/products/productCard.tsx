@@ -116,7 +116,7 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
                     "Content-Type": "multipart/form-data",
                 },
             });
-            const uploadedFilename = response.data;
+            const uploadedFilename = response.data.image;
             setImageName(uploadedFilename);
             setError(null);
         } catch (err: any) {
@@ -130,6 +130,7 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
             console.error("Image upload error:", err);
         } finally {
             setUploadingImage(false);
+            //window.location.reload();
         }
     };
 
