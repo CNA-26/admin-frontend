@@ -249,7 +249,10 @@ const AddProductCard = () => {
                 <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="mt-4 bg-green-600 hover:bg-green-700 text-white text-sm font-medium py-2 px-4 rounded-md transition disabled:opacity-50"
+                    className="mt-4 text-white text-sm font-medium py-2 px-4 rounded-md transition disabled:opacity-50"
+                    style={{ backgroundColor: '#609966' }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#527d55'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#609966'}
                 >
                     {loading ? "Creating..." : "Create Product"}
                 </button>

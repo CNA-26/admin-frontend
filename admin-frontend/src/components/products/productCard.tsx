@@ -223,7 +223,7 @@ const ProductCard = ({ id, name, price, stock, description_text, img, product_co
                         <div className="inline-flex items-center px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-md border border-gray-200">
                             {product_code}
                         </div>
-                        <div className="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-md border border-blue-200">
+                        <div className="inline-flex items-center px-2 py-1 text-xs font-medium bg-[#609966] text-white rounded-md border border-[#609966]">
                             {getCategoryName(category)}
                         </div>
                     </div>

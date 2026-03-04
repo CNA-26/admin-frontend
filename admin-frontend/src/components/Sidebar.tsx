@@ -11,7 +11,7 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="w-64 min-h-screen bg-[var(--color-sidebar)] text-white flex flex-col">
+    <aside className="fixed left-0 top-0 w-64 h-screen bg-[var(--color-sidebar)] text-white flex flex-col overflow-y-auto">
       <div className="p-6 text-2xl font-bold border-b border-white/20">
         Monstera Admin
       </div>

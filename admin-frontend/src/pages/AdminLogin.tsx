@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import MonsteraLogo from '../assets/Monstera.svg';
+import MonsteraLogo from '../assets/monstera.png';
 import { useAuth } from '../context/AuthContext';
 
 export const AdminLogin: React.FC = () => {
@@ -70,14 +70,14 @@ export const AdminLogin: React.FC = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-[#8c7a64] hover:bg-[#7a6a54] disabled:opacity-70 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+            className="w-full bg-[#8c7a64] hover:bg-[#7a6a54] disabled:opacity-70 text-white font-semibold py-1.5 px-3 rounded-full transition duration-200"
           >
             {isSubmitting ? 'Logging in...' : 'Login'}
           </button>
 
           <a
             href="https://store-frontend-git-store-frontend.2.rahtiapp.fi/login"
-            className="mt-3 w-full inline-block text-center border border-[#8c7a64] text-[#8c7a64] hover:bg-[#f3efe9] font-semibold py-2 px-4 rounded-lg transition duration-200"
+            className="mt-3 w-full inline-block text-center border border-[#8c7a64] text-[#8c7a64] hover:bg-[#f3efe9] font-semibold py-1.5 px-3 rounded-full transition duration-200"
           >
             Back to User Login
           </a>
