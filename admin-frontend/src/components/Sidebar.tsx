@@ -46,6 +46,16 @@ const Sidebar = () => {
         >
           Products
         </NavLink>
+        <NavLink
+          to="https://store-frontend-git-store-frontend.2.rahtiapp.fi/"
+          className={({ isActive }) =>
+            `block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition ${
+              isActive ? "bg-[var(--color-sidebar-hover)]" : ""
+            }`
+          }
+        >
+          Store
+        </NavLink>
       </nav>
 
       <div className="sticky bottom-0 p-4 border-t border-white/20 bg-[var(--color-sidebar)]">
