@@ -1,5 +1,7 @@
+import type { MouseEvent } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { buildAuthenticatedStoreUrl } from "../utils/storeFrontendUtils";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -10,6 +12,16 @@ const Sidebar = () => {
     navigate("/login", { replace: true });
   };
 
+  const handleStoreClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    window.location.href = buildAuthenticatedStoreUrl("/");
+  };
+
+  const handleStoreProfileClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    window.location.href = buildAuthenticatedStoreUrl("/profile");
+  };
+
   return (
     <aside className="fixed left-0 top-0 w-64 h-screen bg-[var(--color-sidebar)] text-white flex flex-col overflow-y-auto">
       <div className="p-6 text-2xl font-bold border-b border-white/20">
@@ -17,6 +29,9 @@ const Sidebar = () => {
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
+        <div className="px-3 pt-1 pb-2 text-xs font-semibold tracking-wide text-white/70 uppercase">
+          Admin
+        </div>
         <NavLink
           to="/"
           className={({ isActive }) =>
@@ -46,16 +61,25 @@ const Sidebar = () => {
         >
           Products
         </NavLink>
-        <NavLink
-          to="https://store-frontend-git-store-frontend.2.rahtiapp.fi/"
-          className={({ isActive }) =>
-            `block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition ${
-              isActive ? "bg-[var(--color-sidebar-hover)]" : ""
-            }`
-          }
+
+        <div className="my-2 border-t border-white/20" />
+        <div className="px-3 pt-1 pb-2 text-xs font-semibold tracking-wide text-white/70 uppercase">
+          Store
+        </div>
+        <a
+          href="https://store-frontend-git-store-frontend.2.rahtiapp.fi/"
+          onClick={handleStoreClick}
+          className="block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition"
         >
           Store
-        </NavLink>
+        </a>
+        <a
+          href="https://store-frontend-git-store-frontend.2.rahtiapp.fi/profile"
+          onClick={handleStoreProfileClick}
+          className="block p-3 rounded hover:bg-[var(--color-sidebar-hover)] transition"
+        >
+          Profile
+        </a>
       </nav>
 
       <div className="sticky bottom-0 p-4 border-t border-white/20 bg-[var(--color-sidebar)]">
