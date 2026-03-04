@@ -134,37 +134,39 @@ const products = () => {
             {error && <div className="text-center py-8 text-red-500">{error}</div>}
             {!loading && !error && (
 
-                <><div className="mb-6">
+                <><div className="mb-6 flex items-center justify-between">
                     <input
                         type="text"
                         placeholder="Search product"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-67 flex justify-start mb-4 px-3 py-2 border bg-white rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-67 px-3 py-2 border bg-white rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
 
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as any)}
-                        className="px-3 py-2 border rounded-lg bg-white"
-                    >
-                        <option value="name">Sort by name</option>
-                        <option value="priceCheap">Cheapest first</option>
-                        <option value="priceExpensive">Most expensive first</option>
-                        <option value="stockLow">Low stock first</option>
-                        <option value="stockHigh">High stock first</option>
-                    </select>
+                    <div className="flex gap-3">
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as any)}
+                            className="px-3 py-2 border rounded-lg bg-white"
+                        >
+                            <option value="name">Sort by name</option>
+                            <option value="priceCheap">Cheapest first</option>
+                            <option value="priceExpensive">Most expensive first</option>
+                            <option value="stockLow">Low stock first</option>
+                            <option value="stockHigh">High stock first</option>
+                        </select>
 
-                    <select
-                        value={categoryFilter}
-                        onChange={(e) => setCategoryFilter(e.target.value as any)}
-                        className="px-3 py-2 border rounded-lg bg-white"
-                    >
-                        <option value="all">All</option>
-                        <option value="plants">Plants</option>
-                        <option value="flowers">Cut Flowers</option>
-                        <option value="other">Other</option>
-                    </select>
+                        <select
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value as any)}
+                            className="px-3 py-2 border rounded-lg bg-white"
+                        >
+                            <option value="all">All</option>
+                            <option value="plants">Plants</option>
+                            <option value="flowers">Cut Flowers</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
                 </div>
 
                     <div className="grid grid-cols-4 gap-6 mb-6">
