@@ -76,7 +76,7 @@ export const AdminLogin: React.FC = () => {
           </button>
 
           <a
-            href="https://store-frontend-git-store-frontend.2.rahtiapp.fi/login"
+            href="https://users-frontend-users-frontend.2.rahtiapp.fi/login"
             className="mt-3 w-full inline-block text-center border border-[#8c7a64] text-[#8c7a64] hover:bg-[#f3efe9] font-semibold py-1.5 px-3 rounded-full transition duration-200"
           >
             Back to User Login
